@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  kaya:
+    build:
+      context: ./api
+      target: dev
+    restart: unless-stopped
+    environment:
+      - PG_URL=${PG_URL}
+    env_file:
+      - ./z_env/api.env
+    volumes:
+      - ./api:/src
+    ports:
+      - ${API_PORT}:${API_PORT}
+
+  postgres:
+    image: postgres:14.4
+    restart: unless-stopped
+    volumes:
+      - ./z_storage/db_data:/var/lib/postgresql/db_data
+    environment:
+      - PGPORT=${PG_PORT}
+    env_file:
+      - ./z_env/database.env
+    ports:
+      - ${PG_PORT}:${PG_PORT}
