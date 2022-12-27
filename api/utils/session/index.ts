@@ -5,8 +5,16 @@ import Redis from 'ioredis'
 const redisUrl = process.env.REDIS_SESSION_URL ? process.env.REDIS_SESSION_URL : ''
 const secret = process.env.SECRET ? process.env.SECRET : ''
 
+// if not redisUrl or secret log warning / error / fatal
+
 const RedisStore = RedisConnect(session)
 const redisClient = new Redis(redisUrl)
+
+declare module 'express-session' {
+    export interface SessionData {
+        userId: number
+    }
+}
 
 const sessionOptions = {
     secret,

@@ -8,6 +8,7 @@ services:
     restart: unless-stopped
     environment:
       - PG_URL=${PG_URL}
+      - REDIS_SESSION_URL=${REDIS_SESSION_URL}
     env_file:
       - ./z_env/api.env
     volumes:
@@ -17,7 +18,7 @@ services:
 
   redis:
     image: redis:7
-    build: ./z_storage/redis
+    build: ./redis
     volumes:
       - ./z_storage/redis_data:/data
     ports:

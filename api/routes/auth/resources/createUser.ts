@@ -100,6 +100,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
                 res.status(400).json({ msg: `email ${email} already taken` })
             } else {
                 const createdUser = await createUser({ username, password, email })
+                req.session.userId = createdUser.id
                 return res.status(201).json(createdUser)
             }
         }

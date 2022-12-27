@@ -1,5 +1,6 @@
 
-
+redis_data/
+db_data/
 # Logs
 logs
 *.log
