@@ -8,9 +8,49 @@ datasource db {
 }
 
 model User {
-    id             Int    @id @default(autoincrement())
-    username       String @unique
-    password       String
-    lower_username String @unique
-    email          String @unique
+    id                    Int           @id @default(autoincrement())
+    username              String        @unique
+    password              String
+    lower_username        String        @unique
+    email                 String        @unique
+    games_commissioner_of Game[]
+    games                 UserOnGames[]
+}
+
+model Game {
+    id              Int           @id @default(autoincrement())
+    name            String?
+    commissioner_id Int
+    commissioner    User          @relation(fields: [commissioner_id], references: [id])
+    players         UserOnGames[]
+}
+
+model UserOnGames {
+    player_id Int
+    player    User @relation(fields: [player_id], references: [id])
+    game_id   Int
+    game      Game @relation(fields: [game_id], references: [id])
+
+    @@id([player_id, game_id])
+}
+
+model UserInformationForGame {
+    id        Int      @id @default(autoincrement())
+    joined_at DateTime @default(now())
+    draft     Draft?
+}
+
+model NBAPlayerOnDraft {
+    id        Int   @id @default(autoincrement())
+    player_id Int
+    game_ids  Int[]
+    draft_id  Int
+    draft     Draft @relation(fields: [draft_id], references: [id])
+}
+
+model Draft {
+    id                  Int                    @id @default(autoincrement())
+    nba_players         NBAPlayerOnDraft[]
+    user_information_Id Int                    @unique
+    user_information    UserInformationForGame @relation(fields: [user_information_Id], references: [id])
 }

@@ -1,15 +1,15 @@
-import { client } from '../../../utils/prismaClient'
-import { NextFunction, Request, Response } from 'express'
-import { wrapPrismaQuery } from '../../../utils/prismaTryCatch'
+import { Request, Response, NextFunction } from 'express'
 
-const somePrismaQuery = async () => {}
-
-const Auth = async (req: Request, res: Response, next: NextFunction) => {
-    const response = await wrapPrismaQuery(() => somePrismaQuery(), res)
-    if (response) {
-        res.status(200).json({ msg: 'succes' })
+const auth = async (req: Request, res: Response, next: NextFunction) => {
+    if (req.user?.id && req.user?.username) {
+        res.json({ id: req.user?.id, username: req.user?.username })
     } else {
-        res.status(404).json({ msg: 'failure' })
+        if (process.env.NODE_ENV === 'development') {
+            res.status(401).json({ msg: 'user is not logged in' })
+        } else {
+            res.status(401)
+        }
     }
 }
-export default Auth
+
+export default auth

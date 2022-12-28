@@ -1,9 +1,11 @@
 import express, { ErrorRequestHandler, Request, Response, NextFunction } from 'express'
 import authRouter from './auth'
+import gameRouter from './game'
 
 const defaultRouter = express.Router()
 
 defaultRouter.use('/auth', authRouter)
+defaultRouter.use('/game', gameRouter)
 
 const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
     const environment = process.env.NODE_ENV

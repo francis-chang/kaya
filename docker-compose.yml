@@ -35,3 +35,16 @@ services:
       - ./z_env/database.env
     ports:
       - ${PG_PORT}:${PG_PORT}
+
+  task_queue:
+    build: ./task_queue
+    restart: unless-stopped
+    volumes:
+      - ./task_queue:/src
+    environment:
+      - REDIS_BULLMQ_URL=${REDIS_BULLMQ_URL}
+      - STATS_POSTGRES_DEV_URL=${STATS_POSTGRES_DEV_URL}
+      - STATS_POSTGRES_PROD_URL=${STATS_POSTGRES_PROD_URL}
+      - PG_URL=${PG_URL}
+    depends_on:
+      - redis
