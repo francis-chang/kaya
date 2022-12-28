@@ -1,5 +1,6 @@
 import passport from 'passport'
 import { client } from '../prismaClient'
+import googleStrat from './googleStrat'
 import userpassStrat from './userpassStrat'
 
 declare global {
@@ -18,6 +19,7 @@ declare module 'express-session' {
 }
 
 userpassStrat(passport)
+googleStrat(passport)
 
 passport.serializeUser(function (user, done) {
     done(null, user.id)
