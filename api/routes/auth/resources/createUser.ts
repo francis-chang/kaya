@@ -78,7 +78,7 @@ const createUser = async (user: { username: string; password: string; email: str
             lower_username: username.toLowerCase(),
         },
         select: {
-            id: true,
+            user_id: true,
             username: true,
             email: true,
         },
@@ -100,7 +100,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
                 res.status(400).json({ msg: `email ${email} already taken` })
             } else {
                 const createdUser = await createUser({ username, password, email })
-                req.session.userId = createdUser.id
+                req.session.userId = createdUser.user_id
                 return res.status(201).json(createdUser)
             }
         }

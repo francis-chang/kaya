@@ -12,11 +12,21 @@ import { wrapPrismaQuery } from '../../../utils/prismaTryCatch'
 // const check = v.compile(schema)
 
 const createGame = async (userId: number) => {
-    return await client.game.create({ data: { commissioner_id: userId } })
+    return await client.game.create({
+        data: {
+            commissioner_id: userId,
+            players: {
+                create: {
+                    user_id: userId,
+                    draft: { create: {} },
+                },
+            },
+        },
+    })
 }
 
 export default async (req: Request, res: Response, next: NextFunction) => {
-    const userId = req.session.userId
+    const userId = req.user?.user_id
     if (!userId) {
         res.status(401).json({ msg: 'CANNOT CREATE GAME - NO USER' })
     } else {

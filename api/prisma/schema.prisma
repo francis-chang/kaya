@@ -8,49 +8,44 @@ datasource db {
 }
 
 model User {
-    id                    Int           @id @default(autoincrement())
+    user_id               Int           @id @default(autoincrement())
     username              String        @unique
     password              String
     lower_username        String        @unique
     email                 String        @unique
     games_commissioner_of Game[]
-    games                 UserOnGames[]
+    games                 UserForGame[]
 }
 
 model Game {
-    id              Int           @id @default(autoincrement())
+    game_id         Int           @id @default(autoincrement())
     name            String?
     commissioner_id Int
-    commissioner    User          @relation(fields: [commissioner_id], references: [id])
-    players         UserOnGames[]
+    commissioner    User          @relation(fields: [commissioner_id], references: [user_id])
+    players         UserForGame[]
 }
 
-model UserOnGames {
-    player_id Int
-    player    User @relation(fields: [player_id], references: [id])
-    game_id   Int
-    game      Game @relation(fields: [game_id], references: [id])
-
-    @@id([player_id, game_id])
-}
-
-model UserInformationForGame {
-    id        Int      @id @default(autoincrement())
-    joined_at DateTime @default(now())
-    draft     Draft?
+model UserForGame {
+    userforgame_id Int      @id @default(autoincrement())
+    joined_at      DateTime @default(now())
+    draft          Draft?
+    user_id        Int
+    user           User     @relation(fields: [user_id], references: [user_id])
+    game_id        Int
+    game           Game     @relation(fields: [game_id], references: [game_id])
 }
 
 model NBAPlayerOnDraft {
-    id        Int   @id @default(autoincrement())
-    player_id Int
-    game_ids  Int[]
-    draft_id  Int
-    draft     Draft @relation(fields: [draft_id], references: [id])
+    nbaplayerondraft_id Int   @id @default(autoincrement())
+    player_id           Int
+    game_ids            Int[]
+    draft_id            Int
+    draft               Draft @relation(fields: [draft_id], references: [draft_id])
 }
 
 model Draft {
-    id                  Int                    @id @default(autoincrement())
-    nba_players         NBAPlayerOnDraft[]
-    user_information_Id Int                    @unique
-    user_information    UserInformationForGame @relation(fields: [user_information_Id], references: [id])
+    draft_id       Int                @id @default(autoincrement())
+    nba_players    NBAPlayerOnDraft[]
+    userforgame_id Int                @unique
+    userforgame    UserForGame        @relation(fields: [userforgame_id], references: [userforgame_id])
 }

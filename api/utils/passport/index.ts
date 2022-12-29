@@ -6,7 +6,7 @@ import userpassStrat from './userpassStrat'
 declare global {
     namespace Express {
         interface User {
-            id: number
+            user_id: number
             username: string
         }
     }
@@ -22,12 +22,12 @@ userpassStrat(passport)
 googleStrat(passport)
 
 passport.serializeUser(function (user, done) {
-    done(null, user.id)
+    done(null, user.user_id)
 })
 
-passport.deserializeUser(async function (id: number, done) {
+passport.deserializeUser(async function (user_id: number, done) {
     try {
-        const user = await client.user.findUnique({ where: { id } })
+        const user = await client.user.findUnique({ where: { user_id }, select: { user_id: true, username: true } })
         done(null, user)
     } catch (err) {
         done(err, null)
