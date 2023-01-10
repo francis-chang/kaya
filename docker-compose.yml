@@ -28,7 +28,7 @@ services:
     image: postgres:14.4
     restart: unless-stopped
     volumes:
-      - ./z_storage/db_data:/var/lib/postgresql/db_data
+      - ./z_storage/db_data:/var/lib/postgresql/data
     environment:
       - PGPORT=${PG_PORT}
     env_file:

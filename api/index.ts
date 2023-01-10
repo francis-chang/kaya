@@ -10,7 +10,7 @@ const { PORT } = process.env
 const port = PORT ? PORT : 5555
 
 const corsOptions = {
-    origin: 'http://localhost:3333',
+    origin: ['http://localhost:3333', 'http://localhost:5173'],
     methods: ['POST', 'PUT', 'GET', 'OPTIONS', 'HEAD'],
     credentials: true,
 }

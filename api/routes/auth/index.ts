@@ -3,10 +3,13 @@ import auth from './resources/auth'
 import passport from '../../utils/passport'
 
 import createUser from './resources/createUser'
+import { findUserAvailable, findEmailAvailable } from './resources/findUser'
 
 const authRouter = express.Router()
 
 authRouter.post('/createuser', createUser)
+authRouter.get('/finduser/:username', findUserAvailable)
+authRouter.get('/findemail/:email', findEmailAvailable)
 authRouter.post('/login', passport.authenticate('local'), auth)
 authRouter.get('/google', passport.authenticate('google', { scope: ['email'] }))
 
