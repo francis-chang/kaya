@@ -17,19 +17,27 @@ const validate = (body: any): { isValid: boolean; errors: null | object } => {
     const jsonValidation = check(body)
     if (jsonValidation === true) {
         const { username, password, email } = body
-        const userNameLengthValid = username.length >= 5 && username.length <= 20
+        const userNameLengthValid = username.length >= 6 && username.length <= 30
         if (!userNameLengthValid) {
             return { isValid: false, errors: { msg: `${username} length is not between 5 and 20 inclusive` } }
         }
 
         // may only contain letters, numbers, and underscores
-        const usernameRegex = /^[a-zA-Z0-9_]+$/
+        const usernameRegex = /^[a-zA-Z0-9_.]+$/
         const userRegexValid = usernameRegex.test(username)
         if (!userRegexValid) {
             return { isValid: false, errors: { msg: `username ${username} did not pass regex validation` } }
         }
-        if (username[0] === '_' || username[username.length - 1] === '_') {
-            return { isValid: false, errors: { msg: `username ${username} cannot start or end with an underscore` } }
+        if (
+            username[0] === '_' ||
+            username[username.length - 1] === '_' ||
+            username[0] === '.' ||
+            username[username.length - 1] === '.'
+        ) {
+            return {
+                isValid: false,
+                errors: { msg: `username ${username} cannot start or end with an underscore or period` },
+            }
         }
 
         const passwordLengthValid = password.length >= 8 && password.length <= 100
@@ -80,7 +88,6 @@ const createUser = async (user: { username: string; password: string; email: str
         select: {
             user_id: true,
             username: true,
-            email: true,
         },
     })
 }
