@@ -10,7 +10,7 @@ const authRouter = express.Router()
 authRouter.post('/createuser', createUser)
 authRouter.get('/finduser/:username', findUserAvailable)
 authRouter.get('/findemail/:email', findEmailAvailable)
-authRouter.post('/login', passport.authenticate('local'), auth)
+authRouter.post('/login', auth)
 authRouter.get('/google', passport.authenticate('google', { scope: ['email'] }))
 
 function ensureAuthenticated(req: Request, res: Response, next: NextFunction) {
