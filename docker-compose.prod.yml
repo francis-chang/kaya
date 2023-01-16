@@ -1,0 +1,49 @@
+version: "3.8"
+
+services:
+  kaya:
+    build:
+      context: ./api
+      dockerfile: Dockerfile.prod
+    restart: unless-stopped
+    environment:
+      - PG_URL=${PG_URL}
+      - REDIS_SESSION_URL=${REDIS_SESSION_URL}
+    env_file:
+      - ./z_env/api.env
+    ports:
+      - ${API_PORT}:${API_PORT}
+
+  redis:
+    image: redis:7
+    build: ./redis
+    restart: unless-stopped
+    volumes:
+      - ./z_storage/redis_data:/data
+    ports:
+      - ${REDIS_PORT}:${REDIS_PORT}
+
+  postgres:
+    image: postgres:14.4
+    restart: unless-stopped
+    volumes:
+      - ./z_storage/db_data:/var/lib/postgresql/data
+    environment:
+      - PGPORT=${PG_PORT}
+    env_file:
+      - ./z_env/database.env
+    ports:
+      - ${PG_PORT}:${PG_PORT}
+
+  task_queue:
+    build:
+      context: ./task_queue
+      dockerfile: Dockerfile.dev
+    restart: unless-stopped
+    environment:
+      - REDIS_BULLMQ_URL=${REDIS_BULLMQ_URL}
+      - STATS_POSTGRES_DEV_URL=${STATS_POSTGRES_DEV_URL}
+      - STATS_POSTGRES_PROD_URL=${STATS_POSTGRES_PROD_URL}
+      - PG_URL=${PG_URL}
+    depends_on:
+      - redis
