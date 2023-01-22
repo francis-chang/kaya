@@ -19,13 +19,16 @@ export const findUserAvailable = async (req: Request, res: Response, next: NextF
     const { username } = req.params
     if (!username) {
         res.status(401).json({ msg: 'CANNOT FIND USERNAME - NO USERNAME IN PARAMS' })
+        return
     } else {
         const lower_username = username.toLowerCase()
         const response = await wrapPrismaQuery(() => findUser(lower_username), res)
         if (!response) {
             res.status(200).json({ msg: 'USERNAME_AVAILABLE' })
+            return
         } else {
             res.status(401).json({ msg: 'USERNAME_UNAVAILABLE' })
+            return
         }
     }
 }

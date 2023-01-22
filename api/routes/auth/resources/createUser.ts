@@ -3,8 +3,18 @@ import { NextFunction, Request, Response } from 'express'
 import { wrapPrismaQuery } from '../../../utils/prismaTryCatch'
 import Validator, { ValidationSchema } from 'fastest-validator'
 import * as argon2 from 'argon2'
+import { sendRegisterConfirmation } from '../../../utils/email/postmarkBase'
 
 const v = new Validator()
+
+function randomAlphanumeric() {
+    const characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    let randomString = ''
+    for (let i = 0; i < 5; i++) {
+        randomString += characters.charAt(Math.floor(Math.random() * characters.length))
+    }
+    return randomString
+}
 
 const schema: ValidationSchema = {
     username: { type: 'string', optional: false },
@@ -84,10 +94,12 @@ const createUser = async (user: { username: string; password: string; email: str
             password: await argon2.hash(password),
             email,
             lower_username: username.toLowerCase(),
+            confirmation_code: randomAlphanumeric(),
         },
         select: {
             user_id: true,
             username: true,
+            confirmation_code: true,
         },
     })
 }
@@ -96,19 +108,31 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     const validation = validate(req.body)
     if (!validation.isValid) {
         res.status(400).json(validation.errors)
+        return
     } else {
         const { email, username, password } = req.body
         const userExistsWithUsername = await wrapPrismaQuery(() => findUserWithUsername(username), res)
         if (userExistsWithUsername) {
             res.status(400).json({ msg: `Username ${username} already taken.` })
+            return
         } else {
             const userExistsWithEmail = await wrapPrismaQuery(() => findUserWithEmail(email), res)
             if (userExistsWithEmail) {
                 res.status(400).json({ msg: `Email ${email} already taken.` })
+                return
             } else {
-                const createdUser = await createUser({ username, password, email })
-                req.session.userId = createdUser.user_id
-                return res.status(201).json(createdUser)
+                const createdUser = await wrapPrismaQuery(() => createUser({ username, password, email }), res)
+                if (!createdUser) {
+                    res.status(500).json({ msg: 'An Error Occured when Signing Up.' })
+                    return
+                }
+                await sendRegisterConfirmation(email, createdUser.confirmation_code)
+                req.login(req.body, (err) => {
+                    if (err) {
+                        return next(err)
+                    }
+                    return res.status(201).json({ username: createdUser.username, user_id: createdUser.user_id })
+                })
             }
         }
     }

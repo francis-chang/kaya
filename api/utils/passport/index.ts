@@ -22,7 +22,11 @@ userpassStrat(passport)
 googleStrat(passport)
 
 passport.serializeUser(function (user, done) {
-    done(null, user.user_id)
+    if (user.user_id) {
+        done(null, user.user_id)
+    } else {
+        done(null, false)
+    }
 })
 
 passport.deserializeUser(async function (user_id: number, done) {

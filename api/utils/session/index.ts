@@ -25,6 +25,8 @@ const sessionOptions = {
         //30 minutes
         maxAge: 1800000,
         secure: false,
+        sameSite: false,
+        httpOnly: true,
     },
 }
 

@@ -10,16 +10,20 @@ const { PORT } = process.env
 const port = PORT ? PORT : 5555
 
 const corsOptions = {
-    origin: ['http://localhost:3333', 'http://localhost:5173', 'app.fty.gg', 'https://app.fty.gg', '164.92.105.119'],
+    origin: [
+        'http://localhost:5173',
+        'http://127.0.0.1:5173',
+        'http://localhost:3000',
+        'app.fty.gg',
+        'https://app.fty.gg',
+        '164.92.105.119',
+    ],
     methods: ['POST', 'PUT', 'GET', 'OPTIONS', 'HEAD'],
     credentials: true,
 }
 
 app.use(cors(corsOptions))
 app.use(json())
-app.use(session)
-app.use(passport.initialize())
-app.use(passport.session())
 app.use(morgan('tiny'))
 
 app.use('/', defaultRouter)
