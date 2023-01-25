@@ -13,14 +13,18 @@ const findUser = async (user_id: number) => {
 }
 
 const auth = async (req: Request, res: Response, next: NextFunction) => {
-    if (!req.session.userId) {
-        res.clearCookie('connect.sid').status(401)
-        return
+    console.log(req.session)
+    if (req.session?.passport?.user) {
+        const response = await wrapPrismaQuery(() => findUser(req.session.passport!.user), res)
+        if (response) {
+            return res.status(200).json(response)
+        }
+    } else if (!req.session.userId) {
+        return next()
     } else {
         const response = await wrapPrismaQuery(() => findUser(req.session.userId!), res)
         if (!response) {
-            res.clearCookie('connect.sid').status(401)
-            return
+            return next()
         }
         return res.status(200).json(response)
     }

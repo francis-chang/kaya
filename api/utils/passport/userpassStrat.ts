@@ -13,7 +13,7 @@ export default (passport: PassportStatic) => {
                     },
                 })
 
-                if (user && (await argon2.verify(user.password, password))) {
+                if (user && user.password && (await argon2.verify(user.password, password))) {
                     return done(null, user)
                 } else {
                     return done(null, false)

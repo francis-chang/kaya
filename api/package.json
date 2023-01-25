@@ -15,6 +15,7 @@
     "dependencies": {
         "@prisma/client": "^4.5.0",
         "@types/connect-redis": "^0.0.19",
+        "@types/gapi.auth2": "^0.0.56",
         "argon2": "^0.30.2",
         "axios": "^1.2.3",
         "bullmq": "^3.0.0",

@@ -127,7 +127,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
                     return
                 }
                 await sendRegisterConfirmation(email, createdUser.confirmation_code)
-                req.login(req.body, (err) => {
+                req.login(createdUser, (err) => {
                     if (err) {
                         return next(err)
                     }

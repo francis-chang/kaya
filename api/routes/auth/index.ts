@@ -6,6 +6,8 @@ import passport from '../../utils/passport'
 import createUser from './resources/createUser'
 import { findUserAvailable, findEmailAvailable } from './resources/findUser'
 import session from '../../utils/session'
+import verify from './resources/verify'
+import gAuth from './resources/gAuth'
 
 const authRouter = express.Router()
 
@@ -18,7 +20,9 @@ authRouter.use(passport.initialize())
 authRouter.use(passport.session())
 
 authRouter.post('/createuser', createUser)
+authRouter.get('/googlecallback', gAuth)
 authRouter.post('/login', login)
+// authRouter.post('/gauth', gAuth)
 
 function ensureAuthenticated(req: Request, res: Response, next: NextFunction) {
     if (req.isAuthenticated()) {
@@ -29,5 +33,6 @@ function ensureAuthenticated(req: Request, res: Response, next: NextFunction) {
 
 authRouter.use(ensureAuthenticated)
 authRouter.get('/auth', auth)
+authRouter.post('/verify', verify)
 
 export default authRouter
