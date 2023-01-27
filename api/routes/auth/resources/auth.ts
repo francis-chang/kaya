@@ -13,7 +13,6 @@ const findUser = async (user_id: number) => {
 }
 
 const auth = async (req: Request, res: Response, next: NextFunction) => {
-    console.log(req.session)
     if (req.session?.passport?.user) {
         const response = await wrapPrismaQuery(() => findUser(req.session.passport!.user), res)
         if (response) {

@@ -11,7 +11,7 @@ const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
     const environment = process.env.NODE_ENV
 
     environment === 'development'
-        ? res.status(500).json({ error: err })
+        ? res.status(500).json({ error: 'hiiii' })
         : res.status(500).json({ error: 'Server Error, Please try again later.' })
 }
 
@@ -19,7 +19,7 @@ defaultRouter.use(errorHandler)
 
 const fallBack = (req: Request, res: Response, next: NextFunction) => {
     if (!res.headersSent) {
-        res.status(500).json({ msg: 'A fatal error occured' })
+        res.status(404).json({ msg: 'This Route is not defined' })
     }
 }
 defaultRouter.use(fallBack)

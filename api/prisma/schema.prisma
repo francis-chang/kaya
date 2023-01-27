@@ -22,11 +22,14 @@ model User {
 }
 
 model Game {
-    game_id         Int           @id @default(autoincrement())
-    name            String?
-    commissioner_id Int
-    commissioner    User          @relation(fields: [commissioner_id], references: [user_id])
-    players         UserForGame[]
+    game_id              Int           @id @default(autoincrement())
+    name                 String?
+    numGames             Int
+    draftFormat          String
+    numberOfTeamsToSimul Int
+    commissioner_id      Int
+    commissioner         User          @relation(fields: [commissioner_id], references: [user_id])
+    players              UserForGame[]
 }
 
 model UserForGame {
