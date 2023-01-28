@@ -8,6 +8,7 @@ const findUser = async (user_id: number) => {
         select: {
             user_id: true,
             username: true,
+            verified: true,
         },
     })
 }
@@ -15,8 +16,16 @@ const findUser = async (user_id: number) => {
 const auth = async (req: Request, res: Response, next: NextFunction) => {
     if (req.session?.passport?.user) {
         const response = await wrapPrismaQuery(() => findUser(req.session.passport!.user), res)
+
         if (response) {
-            return res.status(200).json(response)
+            let settingsWarnings = 0
+            if (!response.verified) {
+                settingsWarnings++
+            }
+            if (response.username === null) {
+                settingsWarnings++
+            }
+            return res.status(200).json({ ...response, settingsWarnings })
         }
     } else if (!req.session.userId) {
         return next()
@@ -25,7 +34,14 @@ const auth = async (req: Request, res: Response, next: NextFunction) => {
         if (!response) {
             return next()
         }
-        return res.status(200).json(response)
+        let settingsWarnings = 0
+        if (!response.verified) {
+            settingsWarnings++
+        }
+        if (response.username === null) {
+            settingsWarnings++
+        }
+        return res.status(200).json({ ...response, settingsWarnings })
     }
 }
 

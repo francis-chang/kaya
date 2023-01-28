@@ -8,6 +8,7 @@ import { findUserAvailable, findEmailAvailable } from './resources/findUser'
 import session from '../../utils/session'
 import verify from './resources/verify'
 import gAuth from './resources/gAuth'
+import changeUsername from './resources/changeUsername'
 
 const authRouter = express.Router()
 
@@ -33,6 +34,7 @@ function ensureAuthenticated(req: Request, res: Response, next: NextFunction) {
 
 authRouter.use(ensureAuthenticated)
 authRouter.get('/auth', auth)
+authRouter.post('/changeusername', changeUsername)
 authRouter.post('/verify', verify)
 
 export default authRouter
