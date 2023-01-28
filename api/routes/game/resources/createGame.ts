@@ -7,9 +7,12 @@ const RequestBody = z.object({
     numGames: z.number(),
     draftFormat: z.string(),
     numberOfTeamsToSimul: z.number(),
+    cats: z.array(z.string()),
+    gameType: z.string(),
 })
 
-const createGame = async (data: z.infer<typeof RequestBody>, userId: number) => {
+// data should not be any
+const createGame = async (data: any, userId: number) => {
     return await client.game.create({
         data: {
             commissioner_id: userId,
@@ -26,7 +29,6 @@ const createGame = async (data: z.infer<typeof RequestBody>, userId: number) => 
 
 export default async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.session?.passport?.user
-    console.log(userId)
     if (!userId) {
         return res.status(401).json({ msg: 'CANNOT CREATE GAME - NO USER' })
     }

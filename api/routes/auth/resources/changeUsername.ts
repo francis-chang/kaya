@@ -11,7 +11,7 @@ const findUser = async (userId: number) => {
 const changeUsername = async (username: string, userId: number) => {
     return await client.user.update({
         where: { user_id: userId },
-        data: { username },
+        data: { username, lower_username: username.toLowerCase() },
         select: {
             user_id: true,
             username: true,

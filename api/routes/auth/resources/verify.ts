@@ -20,6 +20,7 @@ const verifyUser = async (user_id: number) => {
         select: {
             user_id: true,
             username: true,
+            verified: true,
         },
     })
 }

@@ -21,12 +21,34 @@ model User {
     games                 UserForGame[]
 }
 
+enum Categories {
+    PTS
+    REB
+    AST
+    STL
+    BLK
+    TOS
+    FGP
+    FTP
+    TPP
+    TPM
+    FAN
+}
+
+enum GameTypes {
+    KOTH
+    SINGLE
+    SEASON
+}
+
 model Game {
     game_id              Int           @id @default(autoincrement())
     name                 String?
     numGames             Int
     draftFormat          String
     numberOfTeamsToSimul Int
+    gameType             GameTypes     @default(SINGLE)
+    cats                 Categories[]
     commissioner_id      Int
     commissioner         User          @relation(fields: [commissioner_id], references: [user_id])
     players              UserForGame[]

@@ -9,6 +9,16 @@ import session from '../../utils/session'
 import verify from './resources/verify'
 import gAuth from './resources/gAuth'
 import changeUsername from './resources/changeUsername'
+import logout from './resources/logout'
+
+import { client } from '../../utils/prismaClient'
+import { wrapPrismaQuery } from '../../utils/prismaTryCatch'
+
+const findUser = async (userId: number) => {
+    return await client.user.findUnique({
+        where: { user_id: userId },
+    })
+}
 
 const authRouter = express.Router()
 
@@ -25,13 +35,23 @@ authRouter.get('/googlecallback', gAuth)
 authRouter.post('/login', login)
 // authRouter.post('/gauth', gAuth)
 
-function ensureAuthenticated(req: Request, res: Response, next: NextFunction) {
-    if (req.isAuthenticated()) {
-        return next()
+async function ensureAuthenticated(req: Request, res: Response, next: NextFunction) {
+    const user = req.session.passport?.user
+    if (req.isAuthenticated() && user) {
+        const response = await wrapPrismaQuery(() => findUser(user), res)
+        if (!response) {
+            res.status(401).json({ msg: 'UNAUTHENTICATED' })
+        } else {
+            if (!response.verified) {
+                res.status(401).json({ msg: 'Please go to Settings to verify your account.' })
+            }
+            res.locals.user = response
+            return next()
+        }
     }
     res.status(401).json({ msg: 'UNAUTHENTICATED' })
 }
-
+authRouter.get('/logout', logout)
 authRouter.use(ensureAuthenticated)
 authRouter.get('/auth', auth)
 authRouter.post('/changeusername', changeUsername)

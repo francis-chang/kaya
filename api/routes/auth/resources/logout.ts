@@ -1,27 +1,13 @@
 import { Request, Response, NextFunction } from 'express'
-import passport from '../../../utils/passport'
 
-const login = async (req: Request, res: Response, next: NextFunction) => {
-    passport.authenticate('local', function (err, user, info) {
+const logout = async (req: Request, res: Response, next: NextFunction) => {
+    req.logout(function (err) {
         if (err) {
-            return next(err)
-        }
-        if (!user) {
-            res.status(401).json({ msg: 'Invalid Username or Password, Please Try Again.' })
-            return
+            res.status(500).json({ msg: 'LOGOUT_FAIL' })
         } else {
-            req.login(user, function (err) {
-                if (err) {
-                    return next(err)
-                }
-                req.session.userId = user.user_id
-                res.status(200).json({
-                    id: user.user_id,
-                    username: user.username,
-                })
-            })
+            res.status(200).json({ msg: 'LOGOUT_SUCCESS' })
         }
-    })(req, res, next)
+    })
 }
 
-export default login
+export default logout
