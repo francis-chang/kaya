@@ -8,7 +8,9 @@ const findUser = async (user_id: number) => {
         select: {
             user_id: true,
             username: true,
+            profile_icon: true,
             verified: true,
+            profile_icon_color: true,
         },
     })
 }
@@ -28,11 +30,11 @@ const auth = async (req: Request, res: Response, next: NextFunction) => {
             return res.status(200).json({ ...response, settingsWarnings })
         }
     } else if (!req.session.userId) {
-        return next()
+        return res.status(400)
     } else {
         const response = await wrapPrismaQuery(() => findUser(req.session.userId!), res)
         if (!response) {
-            return next()
+            return res.status(400)
         }
         let settingsWarnings = 0
         if (!response.verified) {

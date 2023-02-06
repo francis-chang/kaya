@@ -3,11 +3,13 @@ import passport from '../../utils/passport'
 import { client } from '../../utils/prismaClient'
 import { wrapPrismaQuery } from '../../utils/prismaTryCatch'
 import session from '../../utils/session'
-import createGame from './resources/createGame'
+import createGame, { createName } from './resources/createGame'
 import findAllGames from './resources/findAllGames'
 import findGame from './resources/findGame'
+import joinGame, { leaveGameEndpoint } from './resources/joinGame'
 
 const gameRouter = express.Router()
+gameRouter.get('/createname', createName)
 
 gameRouter.use(session)
 gameRouter.use(passport.initialize())
@@ -40,5 +42,7 @@ gameRouter.use(ensureAuthenticated)
 gameRouter.post('/create', createGame)
 gameRouter.get('/find/:id', findGame)
 gameRouter.get('/getallgames', findAllGames)
+gameRouter.post('/joingame', joinGame)
+gameRouter.post('/leavegame', leaveGameEndpoint)
 
 export default gameRouter

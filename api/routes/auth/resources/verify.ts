@@ -30,18 +30,20 @@ const verify = async (req: Request, res: Response, next: NextFunction) => {
     if (!confirmation_code) {
         res.status(400).json({ msg: 'Please Input Your Confirmation Code.' })
         return
-    } else if (!req.session.userId) {
+    } else if (!req.session?.passport?.user) {
+        console.log('what')
         res.clearCookie('connect.sid').status(401)
         return
     } else {
-        const response = await wrapPrismaQuery(() => findUserConfirmationCode(req.session.userId!), res)
+        const response = await wrapPrismaQuery(() => findUserConfirmationCode(req.session?.passport?.user!), res)
+
         if (!response) {
             res.clearCookie('connect.sid').status(401)
             return
         }
 
         if (response.confirmation_code === confirmation_code) {
-            const verifiedResponse = await wrapPrismaQuery(() => verifyUser(req.session.userId!), res)
+            const verifiedResponse = await wrapPrismaQuery(() => verifyUser(req.session?.passport?.user!), res)
 
             if (!verifiedResponse) {
                 res.clearCookie('connect.sid').status(401)

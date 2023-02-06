@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 import { client } from '../../../utils/prismaClient'
 import { wrapPrismaQuery } from '../../../utils/prismaTryCatch'
 import { z } from 'zod'
+import names from './names'
 
 const RequestBody = z.object({
     numGames: z.number(),
@@ -27,6 +28,15 @@ const createGame = async (data: any, userId: number) => {
     })
 }
 
+export const createName = async (req: Request, res: Response, next: NextFunction) => {
+    return res.json({
+        name: names
+            .sort(() => Math.random() - 0.5)
+            .slice(5, 7)
+            .join(' '),
+    })
+}
+
 export default async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.session?.passport?.user
     if (!userId) {
@@ -39,5 +49,5 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     }
 
     const response = await wrapPrismaQuery(() => createGame(req.body, userId), res)
-    res.status(201).json(response)
+    return res.status(201).json(response)
 }

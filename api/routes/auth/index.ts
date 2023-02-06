@@ -13,6 +13,7 @@ import logout from './resources/logout'
 
 import { client } from '../../utils/prismaClient'
 import { wrapPrismaQuery } from '../../utils/prismaTryCatch'
+import { setProfileIconColor, setProfileIconRequest } from './resources/setProfileIcons'
 
 const findUser = async (userId: number) => {
     return await client.user.findUnique({
@@ -40,21 +41,23 @@ async function ensureAuthenticated(req: Request, res: Response, next: NextFuncti
     if (req.isAuthenticated() && user) {
         const response = await wrapPrismaQuery(() => findUser(user), res)
         if (!response) {
-            res.status(401).json({ msg: 'UNAUTHENTICATED' })
+            return res.status(401).json({ msg: 'UNAUTHENTICATED' })
         } else {
-            if (!response.verified) {
-                res.status(401).json({ msg: 'Please go to Settings to verify your account.' })
-            }
+            // if (!response.verified) {
+            //     res.status(401).json({ msg: 'Please go to Settings to verify your account.' })
+            // }
             res.locals.user = response
             return next()
         }
     }
-    res.status(401).json({ msg: 'UNAUTHENTICATED' })
+    return res.status(401).json({ msg: 'UNAUTHENTICATED' })
 }
 authRouter.get('/logout', logout)
 authRouter.use(ensureAuthenticated)
 authRouter.get('/auth', auth)
 authRouter.post('/changeusername', changeUsername)
 authRouter.post('/verify', verify)
+authRouter.post('/changeprofileicon', setProfileIconRequest)
+authRouter.post('/changeprofilecolor', setProfileIconColor)
 
 export default authRouter

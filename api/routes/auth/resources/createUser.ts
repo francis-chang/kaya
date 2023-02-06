@@ -100,6 +100,8 @@ const createUser = async (user: { username: string; password: string; email: str
             user_id: true,
             username: true,
             confirmation_code: true,
+            profile_icon: true,
+            profile_icon_color: true,
         },
     })
 }

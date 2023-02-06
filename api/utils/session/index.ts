@@ -22,8 +22,8 @@ const sessionOptions = {
     resave: true,
     saveUninitialized: true,
     cookie: {
-        //30 minutes
-        maxAge: 1800000,
+        //30 minutes // 2 hours
+        maxAge: 1800000 * 4,
         secure: false,
         sameSite: false,
         httpOnly: true,

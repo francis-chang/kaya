@@ -6,11 +6,11 @@ const findAllGames = async (userId: number) => {
     const response = await client.user.findUnique({
         where: { user_id: userId },
         select: {
-            games: { select: { game: true } },
+            games: { select: { userforgame_id: true, game: true } },
         },
     })
     if (response) {
-        return response.games.map((game) => game.game)
+        return response.games.map((game) => game)
     }
     return null
 }

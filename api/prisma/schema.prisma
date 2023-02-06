@@ -19,6 +19,8 @@ model User {
     verified              Boolean       @default(false)
     games_commissioner_of Game[]
     games                 UserForGame[]
+    profile_icon          String        @default("user")
+    profile_icon_color    String        @default("fff")
 }
 
 enum Categories {
