@@ -6,7 +6,12 @@ const findGame = async (game_id: number) => {
     return await client.game.findUnique({
         where: { game_id },
         include: {
-            players: { include: { draft: true } },
+            players: {
+                include: {
+                    user: { select: { username: true, user_id: true, profile_icon: true, profile_icon_color: true } },
+                    draft: true,
+                },
+            },
         },
     })
 }
