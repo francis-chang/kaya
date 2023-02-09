@@ -28,11 +28,10 @@ const createGame = async (data: any, userId: number) => {
 }
 
 export const createName = async (req: Request, res: Response, next: NextFunction) => {
+    let randomNums = Array.from({ length: 3 }, () => Math.floor(Math.random() * (names.length - 0 + 1) + 0))
+
     return res.json({
-        name: names
-            .sort(() => Math.random() - 0.5)
-            .slice(5, 7)
-            .join(' '),
+        name: `${names[randomNums[0]]} ${names[randomNums[1]]} ${names[randomNums[2]]}`,
     })
 }
 
