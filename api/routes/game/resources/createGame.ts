@@ -21,7 +21,6 @@ const createGame = async (data: any, userId: number) => {
             players: {
                 create: {
                     user_id: userId,
-                    draft: { create: {} },
                 },
             },
         },

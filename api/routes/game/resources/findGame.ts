@@ -9,6 +9,7 @@ const findGame = async (game_id: number) => {
             players: {
                 include: {
                     user: { select: { username: true, user_id: true, profile_icon: true, profile_icon_color: true } },
+
                     draft: true,
                 },
             },

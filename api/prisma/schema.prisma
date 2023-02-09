@@ -43,12 +43,18 @@ enum GameTypes {
     SEASON
 }
 
+enum Status {
+    LOBBY
+    STARTED
+}
+
 model Game {
     game_id              Int           @id @default(autoincrement())
     name                 String?
     numGames             Int
     draftFormat          String
     numberOfTeamsToSimul Int
+    status               Status        @default(LOBBY)
     gameType             GameTypes     @default(SINGLE)
     cats                 Categories[]
     commissioner_id      Int
@@ -66,17 +72,17 @@ model UserForGame {
     game           Game     @relation(fields: [game_id], references: [game_id])
 }
 
+model Draft {
+    draft_id       Int                @id @default(autoincrement())
+    nba_players    NBAPlayerOnDraft[]
+    userforgame_id Int                @unique
+    userforgame    UserForGame        @relation(fields: [userforgame_id], references: [userforgame_id])
+}
+
 model NBAPlayerOnDraft {
     nbaplayerondraft_id Int   @id @default(autoincrement())
     player_id           Int
     game_ids            Int[]
     draft_id            Int
     draft               Draft @relation(fields: [draft_id], references: [draft_id])
-}
-
-model Draft {
-    draft_id       Int                @id @default(autoincrement())
-    nba_players    NBAPlayerOnDraft[]
-    userforgame_id Int                @unique
-    userforgame    UserForGame        @relation(fields: [userforgame_id], references: [userforgame_id])
 }
