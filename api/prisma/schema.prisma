@@ -49,17 +49,21 @@ enum Status {
 }
 
 model Game {
-    game_id              Int           @id @default(autoincrement())
-    name                 String?
-    numGames             Int
-    draftFormat          String
-    numberOfTeamsToSimul Int
-    status               Status        @default(LOBBY)
-    gameType             GameTypes     @default(SINGLE)
-    cats                 Categories[]
-    commissioner_id      Int
-    commissioner         User          @relation(fields: [commissioner_id], references: [user_id])
-    players              UserForGame[]
+    game_id                  Int           @id @default(autoincrement())
+    name                     String?
+    numGames                 Int
+    draftFormat              String
+    numberOfTeamsToSimul     Int
+    currentSDSchedule        Json?
+    draftIntervalInformation Json?
+    kistList                 Int[]
+    singleDraftDraftPeriod   Int           @default(1)
+    status                   Status        @default(LOBBY)
+    gameType                 GameTypes     @default(SINGLE)
+    cats                     Categories[]
+    commissioner_id          Int
+    commissioner             User          @relation(fields: [commissioner_id], references: [user_id])
+    players                  UserForGame[]
 }
 
 model UserForGame {

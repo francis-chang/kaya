@@ -7,6 +7,7 @@ import createGame, { createName } from './resources/createGame'
 import findAllGames from './resources/findAllGames'
 import findGame from './resources/findGame'
 import joinGame, { leaveGameEndpoint, kickPlayerFromGame } from './resources/joinGame'
+import startGame from './resources/startGame'
 
 const gameRouter = express.Router()
 gameRouter.get('/createname', createName)
@@ -45,5 +46,6 @@ gameRouter.get('/getallgames', findAllGames)
 gameRouter.post('/joingame', joinGame)
 gameRouter.post('/leavegame', leaveGameEndpoint)
 gameRouter.post('/kickplayer', kickPlayerFromGame)
+gameRouter.post('/startgame', startGame)
 
 export default gameRouter

@@ -19,7 +19,7 @@ defaultRouter.use(errorHandler)
 
 const fallBack = (req: Request, res: Response, next: NextFunction) => {
     if (!res.headersSent) {
-        res.status(404).json({ msg: 'This Route is not defined' })
+        res.status(404).json({ msg: 'An Error Occured' })
     }
 }
 defaultRouter.use(fallBack)
