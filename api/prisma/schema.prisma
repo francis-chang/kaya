@@ -76,9 +76,16 @@ model UserForGame {
     game           Game     @relation(fields: [game_id], references: [game_id])
 }
 
+enum DraftStatusOptions {
+    NOT_STARTED
+    STARTED
+    ENDED
+}
+
 model Draft {
     draft_id       Int                @id @default(autoincrement())
     nba_players    NBAPlayerOnDraft[]
+    status         DraftStatusOptions @default(NOT_STARTED)
     userforgame_id Int                @unique
     userforgame    UserForGame        @relation(fields: [userforgame_id], references: [userforgame_id])
 }

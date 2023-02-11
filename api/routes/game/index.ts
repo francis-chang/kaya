@@ -5,8 +5,10 @@ import { wrapPrismaQuery } from '../../utils/prismaTryCatch'
 import session from '../../utils/session'
 import createGame, { createName } from './resources/createGame'
 import findAllGames from './resources/findAllGames'
+import findDraft from './resources/findDraft'
 import findGame from './resources/findGame'
 import joinGame, { leaveGameEndpoint, kickPlayerFromGame } from './resources/joinGame'
+import startDraft from './resources/startDraft'
 import startGame from './resources/startGame'
 
 const gameRouter = express.Router()
@@ -47,5 +49,7 @@ gameRouter.post('/joingame', joinGame)
 gameRouter.post('/leavegame', leaveGameEndpoint)
 gameRouter.post('/kickplayer', kickPlayerFromGame)
 gameRouter.post('/startgame', startGame)
+gameRouter.post('/startdraft', startDraft)
+gameRouter.post('/finddraft', findDraft)
 
 export default gameRouter

@@ -1,5 +1,4 @@
-import { addDays } from 'date-fns'
-import { zonedTimeToUtc } from 'date-fns-tz'
+import { addDays, addMinutes } from 'date-fns'
 import { NextFunction, Request, Response } from 'express'
 import { getScheduleSD } from '../../../utils/api/yasha'
 import { client } from '../../../utils/prismaClient'
@@ -15,9 +14,15 @@ const findGame = async (game_id_string: string) => {
     })
 }
 
-const startGame = async (game_id: number, scheduleResponse: any) => {
+const startGame = async (
+    game_id: number,
+    scheduleResponse: any,
+    first_game: any,
+    last_game: any,
+    game_start: string
+) => {
     const now = new Date()
-    addDays
+
     return await client.game.update({
         where: {
             game_id,
@@ -27,14 +32,15 @@ const startGame = async (game_id: number, scheduleResponse: any) => {
             status: 'STARTED',
             draftIntervalInformation: {
                 date_started: now.toUTCString(),
-                draft_interval_end: addDays(now, 1).toUTCString(),
+                first_game,
+                last_game,
+                game_start,
             },
         },
         include: {
             players: {
                 include: {
                     user: { select: { username: true, user_id: true, profile_icon: true, profile_icon_color: true } },
-
                     draft: true,
                 },
             },
@@ -59,7 +65,31 @@ export default async (req: Request, res: Response, next: NextFunction) => {
             const scheduleResponse = await getScheduleSD(game.numGames, game.singleDraftDraftPeriod)
 
             if (scheduleResponse) {
-                const response = await wrapPrismaQuery(() => startGame(game.game_id, scheduleResponse), res)
+                let first_game = {} as any
+                let last_game = {} as any
+
+                scheduleResponse.forEach((team, teamIndex) => {
+                    team.games.forEach((g, index) => {
+                        if (index === 0 && teamIndex === 0) {
+                            last_game = g
+                            first_game = g
+                        } else {
+                            if (g.DateTime > last_game.DateTime) {
+                                last_game = g
+                            }
+                            if (g.DateTime < first_game.DateTime) {
+                                first_game = g
+                            }
+                        }
+                    })
+                })
+
+                const game_start = addMinutes(new Date(first_game.DateTime), -30).toUTCString()
+
+                const response = await wrapPrismaQuery(
+                    () => startGame(game.game_id, scheduleResponse, first_game, last_game, game_start),
+                    res
+                )
                 return res.status(200).json(response)
             }
         }
