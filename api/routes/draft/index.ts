@@ -3,9 +3,16 @@ import passport from '../../utils/passport'
 import { client } from '../../utils/prismaClient'
 import { wrapPrismaQuery } from '../../utils/prismaTryCatch'
 import session from '../../utils/session'
+import { computerDraftPick } from '../../utils/tasks'
 import { startDraftEndpoint } from './draftStatus'
 
 const draftRouter = express.Router()
+
+draftRouter.post('/drafttest', async (req, res, next) => {
+    const { draft_id } = req.body as { draft_id: number }
+    await computerDraftPick(draft_id)
+    res.status(200).json('yellow')
+})
 
 draftRouter.use(session)
 draftRouter.use(passport.initialize())
