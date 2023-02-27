@@ -1,8 +1,8 @@
 import statsqueue from './producer'
 
-const addToQueue = (name: string, data: any) => {
+const addToQueue = async (name: string, data: any) => {
     try {
-        statsqueue.add(name, data)
+        await statsqueue.add(name, data)
     } catch (err) {
         console.log(err)
     }
@@ -11,7 +11,11 @@ const addToQueue = (name: string, data: any) => {
 // loadTopStatlines(job.data.numberOfDaysAgo, job.data.numberOfStatlines)
 
 const computerDraftPick = async (draft_id: number) => {
-    addToQueue('computerDraftPick', draft_id)
+    await addToQueue('computerDraftPick', draft_id)
 }
 
-export { computerDraftPick }
+const draftInitialize = async (draft_id: number) => {
+    await addToQueue('draftInitialize', draft_id)
+}
+
+export { computerDraftPick, draftInitialize }

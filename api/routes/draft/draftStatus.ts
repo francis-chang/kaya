@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import { client } from '../../utils/prismaClient'
 import { wrapPrismaQuery } from '../../utils/prismaTryCatch'
+import { draftInitialize } from '../../utils/tasks'
 
 const startDraft = async (draft_id: number) => {
     return await client.draft.update({
@@ -11,7 +12,8 @@ const startDraft = async (draft_id: number) => {
 
 const startDraftEndpoint = async (req: Request, res: Response, next: NextFunction) => {
     const { draft_id } = req.body as { draft_id: number }
-    await wrapPrismaQuery(() => startDraft(draft_id), res)
+    await draftInitialize(draft_id)
+    res.status(201).json({ msg: 'draft started' })
 }
 
 export { startDraftEndpoint }

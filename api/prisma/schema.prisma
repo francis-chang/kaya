@@ -57,6 +57,7 @@ model Game {
     currentSDSchedule        Json?
     draftIntervalInformation Json?
     kistList                 Int[]
+    draft_interval_time      Int           @default(60)
     singleDraftDraftPeriod   Int           @default(1)
     status                   Status        @default(LOBBY)
     gameType                 GameTypes     @default(SINGLE)
@@ -90,12 +91,13 @@ model Draft {
     userforgame         UserForGame        @relation(fields: [userforgame_id], references: [userforgame_id])
     current_pick        Int                @default(0)
     time_till_next_pick DateTime?
+    is_player_turn      Boolean            @default(false)
     pick_position       Int
     pick_numbers        Int[]
-    picks               Json?
+    picks               Json               @default("[]")
     draft_started       DateTime?
     draft_ended         DateTime?
-    all_picks           Json?
+    all_picks           Json               @default("[]")
 }
 
 model NBAPlayerOnDraft {

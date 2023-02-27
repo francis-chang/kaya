@@ -5,6 +5,7 @@ import { wrapPrismaQuery } from '../../utils/prismaTryCatch'
 import session from '../../utils/session'
 import { computerDraftPick } from '../../utils/tasks'
 import { startDraftEndpoint } from './draftStatus'
+import playerPick from './playerPick'
 
 const draftRouter = express.Router()
 
@@ -43,6 +44,25 @@ async function ensureAuthenticated(req: Request, res: Response, next: NextFuncti
 
 draftRouter.use(ensureAuthenticated)
 
+draftRouter.get('/get', async (req, res, next) => {
+    const { draft_id } = req.body
+    if (!draft_id) {
+        return res.status(400).json({ msg: 'Please provide draft_id' })
+    } else {
+        const draft = await wrapPrismaQuery(async () => {
+            return await client.draft.findUnique({
+                where: { draft_id },
+            })
+        }, res)
+        if (draft) {
+            return res.status(200).json(draft)
+        }
+    }
+    next()
+})
+
 draftRouter.post('/draftstart', startDraftEndpoint)
+
+draftRouter.post('/playerpick', playerPick)
 
 export default draftRouter
