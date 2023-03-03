@@ -3,6 +3,7 @@ import addSeconds from 'date-fns/addSeconds'
 import { addToQueueDelay } from '../../utils/producer'
 import { client } from '../../utils/prismaClient'
 import wrapPrismaQuery from '../../utils/prismaTryCatch'
+import pusher from '../../utils/pusher'
 
 // IT IS OPTIMAL THAT KAYA HAS IT'S OWN CACHE FOR COMPUTER_DRAFT_LIST FROM YASHA REDIS
 // HOWEVER FOR NOW, JUST FETCH
@@ -101,9 +102,21 @@ export default async ({ draft_id, pick_to_check }: Props) => {
                     { draft_id, pick_to_check: draft.current_pick + 1 },
                     draft.userforgame.game.draft_interval_time * 1000
                 )
+                await pusher.trigger(`draft_${draft_id}`, 'draft_computer_pick', {
+                    is_player_turn: true,
+                    time_till_next_pick,
+                    current_pick: draft.current_pick + 1,
+                    picked_player: available_players[0],
+                })
             } else {
                 await wrapPrismaQuery(() => updateDraftPlayerTurn(draft_id))
                 await addToQueueDelay('computerDraftPick', { draft_id, pick_to_check: draft.current_pick + 1 }, 1000)
+                await pusher.trigger(`draft_${draft_id}`, 'draft_computer_pick', {
+                    is_player_turn: true,
+                    time_till_next_pick: null,
+                    current_pick: draft.current_pick + 1,
+                    picked_player: available_players[0],
+                })
             }
         }
     } catch (err) {

@@ -1,12 +1,8 @@
-import axios from 'axios'
 import { addToQueueDelay } from '../../utils/producer'
 import { client } from '../../utils/prismaClient'
 import wrapPrismaQuery from '../../utils/prismaTryCatch'
 import { addSeconds } from 'date-fns'
-
-// IT IS OPTIMAL THAT KAYA HAS IT'S OWN CACHE FOR COMPUTER_DRAFT_LIST FROM YASHA REDIS
-// HOWEVER FOR NOW, JUST FETCH
-const YASHA_URL = 'https://yasha.fty.gg/rdata'
+import pusher from '../../utils/pusher'
 
 const findDraft = async (draft_id: number) => {
     return await client.draft.findUnique({
@@ -38,7 +34,6 @@ const updateDraftTimeTillNextPick = async (draft_id: number, time_till_next_pick
 }
 
 export default async (draft_id: number) => {
-    console.log('helloooo')
     const draft = await wrapPrismaQuery(() => findDraft(draft_id))
     if (draft) {
         if (draft.status === 'NOT_STARTED') {
@@ -49,8 +44,18 @@ export default async (draft_id: number) => {
                 const time_till_next_pick = addSeconds(new Date(), draft_interval_time)
                 await wrapPrismaQuery(() => updateDraftTimeTillNextPick(draft_id, time_till_next_pick, true))
                 await addToQueueDelay('computerDraftPick', { draft_id, pick_to_check: 1 }, draft_interval_time * 1000)
+                await pusher.trigger(`draft_${draft_id}`, 'draft_init', {
+                    is_player_turn: true,
+                    time_till_next_pick,
+                    current_pick: 1,
+                })
             } else {
                 await addToQueueDelay('computerDraftPick', { draft_id, pick_to_check: 1 }, 1000)
+                await pusher.trigger(`draft_${draft_id}`, 'draft_init', {
+                    is_player_turn: false,
+                    time_till_next_pick: null,
+                    current_pick: 1,
+                })
             }
         } else {
             console.log(`draft_id ${draft_id} was requested to start, but does not current have the "NOT_STARTED" flag`)

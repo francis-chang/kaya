@@ -1,5 +1,6 @@
 import addSeconds from 'date-fns/addSeconds'
 import { Request, Response, NextFunction } from 'express'
+import pusher from '../../utils/pusher'
 import { client } from '../../utils/prismaClient'
 import { wrapPrismaQuery } from '../../utils/prismaTryCatch'
 import statsqueue from '../../utils/tasks/producer'
@@ -105,9 +106,21 @@ const player_pick_for_draft = async (req: Request, res: Response, next: NextFunc
                         { draft_id, pick_to_check: current_pick },
                         draft_interval_time * 1000
                     )
+                    await pusher.trigger(`draft_${draft_id}`, 'draft_player_pick', {
+                        is_player_turn: true,
+                        time_till_next_pick,
+                        current_pick: current_pick,
+                        picked_player: player_tobe_drafted,
+                    })
                 } else {
                     await wrapPrismaQuery(() => updateDraftTimeTillNextPickNonPlayer(draft_id), res)
                     await addToQueueDelay('computerDraftPick', { draft_id, pick_to_check: current_pick }, 1000)
+                    await pusher.trigger(`draft_${draft_id}`, 'draft_player_pick', {
+                        is_player_turn: false,
+                        time_till_next_pick: null,
+                        current_pick: current_pick,
+                        picked_player: player_tobe_drafted,
+                    })
                 }
                 const response = await wrapPrismaQuery(
                     () => updateDraft(draft.draft_id, picks, all_picks, current_pick),
