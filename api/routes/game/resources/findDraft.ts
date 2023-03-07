@@ -5,7 +5,21 @@ import { wrapPrismaQuery } from '../../../utils/prismaTryCatch'
 const findDraft = async (draft_id: number) => {
     return await client.draft.findUnique({
         where: { draft_id },
-        include: { userforgame: true },
+        include: {
+            userforgame: {
+                include: {
+                    game: {
+                        select: {
+                            numberOfTeamsToSimul: true,
+                            draft_interval_time: true,
+                            game_id: true,
+                            status: true,
+                            gameType: true,
+                        },
+                    },
+                },
+            },
+        },
     })
 }
 

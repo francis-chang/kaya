@@ -41,9 +41,13 @@ export default async (draft_id: number) => {
             console.log(`draft id ${draft_id} has started`)
             if (draft.pick_position === 1) {
                 const draft_interval_time = draft.userforgame.game.draft_interval_time
-                const time_till_next_pick = addSeconds(new Date(), draft_interval_time)
+                const time_till_next_pick = addSeconds(new Date(), draft_interval_time + 3)
                 await wrapPrismaQuery(() => updateDraftTimeTillNextPick(draft_id, time_till_next_pick, true))
-                await addToQueueDelay('computerDraftPick', { draft_id, pick_to_check: 1 }, draft_interval_time * 1000)
+                await addToQueueDelay(
+                    'computerDraftPick',
+                    { draft_id, pick_to_check: 1 },
+                    draft_interval_time * 1000 + 3000
+                )
                 await pusher.trigger(`draft_${draft_id}`, 'draft_init', {
                     is_player_turn: true,
                     time_till_next_pick,

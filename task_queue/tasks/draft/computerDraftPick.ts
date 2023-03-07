@@ -58,6 +58,13 @@ const updateDraftPlayerTurn = async (draft_id: number) => {
     })
 }
 
+function getDraftPick(current_pick: number, num_teams: number) {
+    const current_round = Math.ceil(current_pick / num_teams) // Calculate the current round
+    const current_pick_in_round = current_pick % num_teams || num_teams // Calculate the current pick number in the round
+
+    return `Round ${current_round} Pick ${current_pick_in_round}`
+}
+
 type Props = {
     draft_id: number
     pick_to_check: number
@@ -85,28 +92,34 @@ export default async ({ draft_id, pick_to_check }: Props) => {
             const drafted_player_ids = all_picks.map((pick: any) => pick.PlayerID)
             const available_players = data.filter((player) => !drafted_player_ids.includes(player.PlayerID))
 
+            const chosen_player = {
+                ...available_players[0],
+                info: getDraftPick(draft.current_pick, draft.userforgame.game.numberOfTeamsToSimul),
+                picked_at: draft.current_pick,
+            }
+
             //@ts-ignore
-            all_picks.push(available_players[0])
+            all_picks.push(chosen_player)
+
             if (draft.pick_numbers.includes(draft.current_pick)) {
                 //@ts-ignore
-                picks.push(available_players[0])
-                console.log(available_players[0].s_name)
+                picks.push(chosen_player)
             }
             //@ts-ignore
             await wrapPrismaQuery(() => updateDraft(all_picks, picks, draft_id, draft.current_pick + 1))
             if (draft.pick_numbers.includes(draft.current_pick + 1)) {
-                const time_till_next_pick = addSeconds(new Date(), draft.userforgame.game.draft_interval_time)
+                const time_till_next_pick = addSeconds(new Date(), draft.userforgame.game.draft_interval_time + 3)
                 await wrapPrismaQuery(() => updateDraftTimeTillNextPick(draft_id, time_till_next_pick, true))
                 await addToQueueDelay(
                     'computerDraftPick',
                     { draft_id, pick_to_check: draft.current_pick + 1 },
-                    draft.userforgame.game.draft_interval_time * 1000
+                    draft.userforgame.game.draft_interval_time * 1000 + 3000
                 )
                 await pusher.trigger(`draft_${draft_id}`, 'draft_computer_pick', {
                     is_player_turn: true,
                     time_till_next_pick,
                     current_pick: draft.current_pick + 1,
-                    picked_player: available_players[0],
+                    picked_player: chosen_player,
                 })
             } else {
                 await wrapPrismaQuery(() => updateDraftPlayerTurn(draft_id))
@@ -115,7 +128,7 @@ export default async ({ draft_id, pick_to_check }: Props) => {
                     is_player_turn: true,
                     time_till_next_pick: null,
                     current_pick: draft.current_pick + 1,
-                    picked_player: available_players[0],
+                    picked_player: chosen_player,
                 })
             }
         }
