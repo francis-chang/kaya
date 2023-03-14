@@ -101,6 +101,7 @@ const player_pick_for_draft = async (req: Request, res: Response, next: NextFunc
                     ...player_tobe_drafted,
                     info: getDraftPick(draft.current_pick, draft.userforgame.game.numberOfTeamsToSimul),
                     picked_at: draft.current_pick,
+                    type: 'PLAYER_PICK',
                 }
                 //@ts-ignore
                 const picks = [...draft.picks, drafted_player]

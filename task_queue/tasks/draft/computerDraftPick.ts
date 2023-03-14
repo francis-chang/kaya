@@ -96,6 +96,7 @@ export default async ({ draft_id, pick_to_check }: Props) => {
                 ...available_players[0],
                 info: getDraftPick(draft.current_pick, draft.userforgame.game.numberOfTeamsToSimul),
                 picked_at: draft.current_pick,
+                type: draft.pick_numbers.includes(draft.current_pick) ? 'PLAYER_PICK' : 'COMPUTER_PICK',
             }
 
             //@ts-ignore
@@ -125,7 +126,7 @@ export default async ({ draft_id, pick_to_check }: Props) => {
                 await wrapPrismaQuery(() => updateDraftPlayerTurn(draft_id))
                 await addToQueueDelay('computerDraftPick', { draft_id, pick_to_check: draft.current_pick + 1 }, 1000)
                 await pusher.trigger(`draft_${draft_id}`, 'draft_computer_pick', {
-                    is_player_turn: true,
+                    is_player_turn: false,
                     time_till_next_pick: null,
                     current_pick: draft.current_pick + 1,
                     picked_player: chosen_player,
