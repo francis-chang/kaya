@@ -8,6 +8,7 @@ import findAllGames from './resources/findAllGames'
 import findDraft from './resources/findDraft'
 import findGame from './resources/findGame'
 import joinGame, { leaveGameEndpoint, kickPlayerFromGame } from './resources/joinGame'
+import searchGames from './resources/searchGames'
 import startDraft from './resources/startDraft'
 import startGame from './resources/startGame'
 
@@ -51,5 +52,6 @@ gameRouter.post('/kickplayer', kickPlayerFromGame)
 gameRouter.post('/startgame', startGame)
 gameRouter.post('/startdraft', startDraft)
 gameRouter.post('/finddraft', findDraft)
+gameRouter.get('/searchgames', searchGames)
 
 export default gameRouter

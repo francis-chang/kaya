@@ -15,6 +15,7 @@ const findDraft = async (draft_id: number) => {
                             game_id: true,
                             status: true,
                             gameType: true,
+                        
                         },
                     },
                 },

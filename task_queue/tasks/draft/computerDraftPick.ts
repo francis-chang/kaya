@@ -30,12 +30,17 @@ const updateDraft = async (all_picks: any[], picks: any[], draft_id: number, cur
 }
 
 const endDraft = async (draft_id: number) => {
-    return await client.draft.update({
+    const end_date = new Date()
+    await client.draft.update({
         where: { draft_id },
         data: {
-            draft_ended: new Date(),
+            draft_ended: end_date,
             status: 'ENDED',
         },
+    })
+    await pusher.trigger(`draft_${draft_id}`, 'draft_ended', {
+        draft_ended: end_date,
+        status: 'ENDED',
     })
 }
 
@@ -83,9 +88,10 @@ export default async ({ draft_id, pick_to_check }: Props) => {
             } else if (draft.current_pick > Math.max(...draft.pick_numbers)) {
                 console.log('Draft Ended')
                 await wrapPrismaQuery(() => endDraft(draft_id))
+
                 return
             }
-            const { draft_started, draft_ended, picks, all_picks } = draft
+            const { picks, all_picks } = draft
             const { data } = axios_response
 
             //@ts-ignore
