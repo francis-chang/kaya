@@ -46,5 +46,7 @@ services:
       - STATS_POSTGRES_DEV_URL=${STATS_POSTGRES_DEV_URL}
       - STATS_POSTGRES_PROD_URL=${STATS_POSTGRES_PROD_URL}
       - PG_URL=${PG_URL}
+    env_file:
+      - ./z_env/task_queue.env
     depends_on:
       - redis
