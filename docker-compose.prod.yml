@@ -9,6 +9,7 @@ services:
     environment:
       - PG_URL=${PG_URL}
       - REDIS_SESSION_URL=${REDIS_SESSION_URL}
+      - REDIS_BULLMQ_URL=${REDIS_BULLMQ_URL}
       - NODE_ENV=production
     env_file:
       - ./z_env/api.env
